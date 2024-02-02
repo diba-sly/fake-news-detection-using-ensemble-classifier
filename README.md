@@ -21,7 +21,15 @@ This model contains ensemble of NN models as first classifier.
 ## Model 4:
 This model contains ensemble of SVM, LSTM and PA as first classifier and then using stacking ensemble for inputs of MLP classifier.
 
-**Experiment History:** The results for any special change on model parameters are recorded here.
+## Model 5:
+This model contains ensemble of SVM, LSTM, PA and XGBoost as first classifier and then using stacking ensemble for inputs of MLP classifier.
+
+The main diffrence of Model4 with Model 5 is in preproccesing. In Model 5 I used SMOTE for oversampling 'Real' news in datasets for equl distribution between classes.
+
+Also I added more plots for classifiers in this one.
+
+**Experiment History:** 
+
 
 
 
