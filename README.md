@@ -16,9 +16,6 @@ This repo is related to a my researches "Improving F-Score for Fake News Detecti
 
 # Models:
 
-## Model 1:
-This model contains ensemble of NN models as first classifier.
-
 ## Model 4:
 This model contains ensemble of SVM, LSTM and PA as first classifier and then using stacking ensemble for inputs of MLP classifier.
 
