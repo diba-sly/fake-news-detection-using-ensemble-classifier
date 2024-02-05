@@ -26,6 +26,12 @@ The main diffrence of Model4 with Model 5 is in preproccesing. In Model 5 I used
 
 Also I added more plots for classifiers in this one.
 
+## Model 6:
+
+This model contains ensemble of SVM, PA, XGBoost, LSTM and BiLSTM as first classifier and then using stacking ensemble for inputs of MLP classifier.
+the main diffrence of this Model6 is that the machine learnings models (SVM, PA and XGBoost) are vectorized just by TFIDF and then oversampling with SMOTE. but the deep learnings model (LSTM and BiLSTM) are tokenized and vectorized by Word2Vec. This is beacuse of the effects of preprocesses on result of each model.
+
+The functionality of each model are seprated in diffrente '.ipnyb' files. and then the scripts of them are in Scripts folder, so in Model6 I imported the Scripts models to use the functionality of them.
 **Experiment History:** 
 
 
