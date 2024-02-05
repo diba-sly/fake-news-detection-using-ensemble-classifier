@@ -19,6 +19,7 @@ This repo is related to a my researches "Improving F-Score for Fake News Detecti
 ## Model 4:
 This model contains ensemble of SVM, LSTM and PA as first classifier and then using stacking ensemble for inputs of MLP classifier.
 
+
 ## Model 5:
 This model contains ensemble of SVM, LSTM, PA and XGBoost as first classifier and then using stacking ensemble for inputs of MLP classifier.
 
@@ -32,6 +33,7 @@ This model contains ensemble of SVM, PA, XGBoost, LSTM and BiLSTM as first class
 the main diffrence of this Model6 is that the machine learnings models (SVM, PA and XGBoost) are vectorized just by TFIDF and then oversampling with SMOTE. but the deep learnings model (LSTM and BiLSTM) are tokenized and vectorized by Word2Vec. This is beacuse of the effects of preprocesses on result of each model.
 
 The functionality of each model are seprated in diffrente '.ipnyb' files. and then the scripts of them are in Scripts folder, so in Model6 I imported the Scripts models to use the functionality of them.
+
 **Experiment History:** 
 
 
