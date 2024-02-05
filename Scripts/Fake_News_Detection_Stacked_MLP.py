@@ -28,7 +28,7 @@ def build_mlp(X_train, y_train, X_test):
     return mlp_predictions
 
 
-# In[ ]:
+# In[2]:
 
 
 def mlp_metrics(mlp_predictions, y_test):
@@ -37,4 +37,11 @@ def mlp_metrics(mlp_predictions, y_test):
     print(classification_report(y_test, mlp_predictions))
     print("MLP F-score:", f_score)
     print("MLP Accuracy:", accuracy)
+    return f_score, accuracy
+
+
+# In[ ]:
+
+
+
 

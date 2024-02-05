@@ -3,19 +3,19 @@
 
 # LSTM classifier
 
-# In[27]:
+# In[38]:
 
 
 import re
-#from tensorflow.keras import regularizers, initializers, optimizers, callbacks
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import Sequential
 import pandas as pd
 import numpy as np
-from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import precision_recall_fscore_support, confusion_matrix, roc_curve, roc_auc_score
 import matplotlib.pyplot as plt
 import time
+import seaborn as sns
 
 
 # In[28]:

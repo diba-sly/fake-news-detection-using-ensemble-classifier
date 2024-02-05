@@ -3,7 +3,7 @@
 
 # BiLSTM classifier
 
-# In[19]:
+# In[28]:
 
 
 import re
@@ -16,6 +16,7 @@ from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import confusion_matrix, auc, roc_curve, roc_auc_score
 import matplotlib.pyplot as plt
 import time
+import seaborn as sns
 
 
 # In[20]:
@@ -61,7 +62,7 @@ def predict_bilstm(bilstm_model, X_train, X_test):
     return bilstm_train_predictions, bilstm_predictions
 
 
-# In[23]:
+# In[29]:
 
 
 def bilstm_metrics(bilstm_predictions, y_test):
@@ -73,7 +74,7 @@ def bilstm_metrics(bilstm_predictions, y_test):
     print("BiLSTM - Precision:", precision)
     print("BiLSTM - Recall:", recall)
     print("BiLSTM - F-score:", fscore)
-    return accuracy,recision, recall, fscore
+    return accuracy,precision, recall, fscore
 
 
 # In[24]:
