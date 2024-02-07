@@ -18,18 +18,10 @@ import time
 import seaborn as sns
 
 
-# In[28]:
-
-
-# Constants
-MAX_SEQUENCE_LENGTH = 300
-EMBEDDING_DIM = 150
-
-
 # In[29]:
 
 
-def pad_sequence_data(X_train,X_valid,X_test):
+def pad_sequence_data(X_train,X_valid,X_test,MAX_SEQUENCE_LENGTH=300,EMBEDDING_DIM=150):
     X_train = pad_sequences(X_train, maxlen=MAX_SEQUENCE_LENGTH)
     X_valid = pad_sequences(X_valid, maxlen=MAX_SEQUENCE_LENGTH)
     X_test = pad_sequences(X_test, maxlen=MAX_SEQUENCE_LENGTH)
@@ -39,7 +31,7 @@ def pad_sequence_data(X_train,X_valid,X_test):
 # In[36]:
 
 
-def train_lstm(vocab_size, embedding_matrix, X_train, y_train, epoches=10,batch_size=128):
+def train_lstm(vocab_size, embedding_matrix, X_train, y_train, epoches=10,batch_size=128,MAX_SEQUENCE_LENGTH=300,EMBEDDING_DIM=150):
     start_time = time.time()
     
     model = Sequential()
@@ -66,13 +58,16 @@ def train_lstm(vocab_size, embedding_matrix, X_train, y_train, epoches=10,batch_
     return model, history
 
 
-# In[37]:
+# In[1]:
 
 
-def predict_lstm(lstm_model, X_train, X_test):
-    lstm_train_predictions = (lstm_model.predict(X_train) > 0.4).astype(int).flatten()
-    lstm_predictions = (lstm_model.predict(X_test) > 0.4).astype(int).flatten()
-    return lstm_train_predictions, lstm_predictions
+def predict_lstm(lstm_model, X_train, X_test, threshold=0.4):
+    lstm_scores=lstm_model.predict(X_test)
+    lstm_train_scores=lstm_model.predict(X_train)
+    
+    lstm_train_predictions = (lstm_train_scores > threshold).astype(int).flatten()
+    lstm_predictions = (lstm_scores > threshold).astype(int).flatten()
+    return lstm_train_predictions, lstm_predictions, lstm_train_scores, lstm_scores
 
 
 # In[32]:

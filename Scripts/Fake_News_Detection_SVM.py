@@ -3,26 +3,28 @@
 
 # SVM classifier
 
-# In[20]:
+# In[6]:
 
 
 from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV
 import time
-from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import precision_recall_fscore_support,make_scorer, f1_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix, auc, roc_curve, roc_auc_score
 import matplotlib.pyplot as plt
+from sklearn.model_selection import cross_val_score, StratifiedKFold
+import numpy as np
 
 
-# In[21]:
+# In[5]:
 
 
-def train_svm(x_train, y_train, x_test):
+def train_svm(x_train, y_train, x_test, c=10, gamma='scale', kernal='sigmoid'):
     start_time = time.time()
 
-    svm_model = SVC(C=10, gamma='scale', kernel='poly')
+    svm_model = SVC(C=c, gamma=gamma, kernel=kernal)
     svm_model.fit(x_train, y_train)
     svm_train_valid_predictions = svm_model.predict(x_train)
     svm_predictions = svm_model.predict(x_test)
@@ -110,6 +112,34 @@ def svm_roc_plot(svm_predictions, y_test):
     plt.title('Receiver Operating Characteristic (ROC) -SVM')
     plt.legend(loc="lower right")
     plt.show()
+
+
+# In[4]:
+
+
+def cross_validate_svm(X, y, svm_params, cv_splits=5):
+    
+    # Define SVM parameters
+#     svm_params = {'C': 10, 'kernel': 'sigmoid', 'gamma': 'scale'}
+
+    svm_model = SVC(**svm_params)
+    
+    f1_scorer = make_scorer(f1_score, average='micro')
+    cv_scores = cross_val_score(svm_model, X, y, cv=cv_splits, scoring=f1_scorer)
+    
+    average_f1_score = np.mean(cv_scores)
+    print("Cross Validation F1 Scores:", cv_scores)
+    print("Average F1 Score:", average_f1_score)
+        
+    plt.figure(figsize=(8, 6))
+    plt.bar(np.arange(1, cv_splits + 1), cv_scores, color='skyblue')
+    plt.xlabel('Cross Validation Split')
+    plt.ylabel('F1 Score Score')
+    plt.title('Cross Validation Scores for SVM')
+    plt.ylim(0, 1)
+    plt.show()
+    
+    return cv_scores, average_f1_score
 
 
 # In[ ]:

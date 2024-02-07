@@ -3,7 +3,7 @@
 
 # Read data and prepare them
 
-# In[9]:
+# In[101]:
 
 
 import pandas as pd
@@ -23,123 +23,23 @@ import matplotlib.pyplot as plt
 from sklearn.utils import shuffle
 
 
-# In[10]:
+# In[102]:
 
 
 #Global constants
 tokenizer = Tokenizer()
 vectorizer = TfidfVectorizer()
+MAX_SEQUENCE_LENGTH = 300
+EMBEDDING_DIM = 150
 
 
-# In[7]:
+# In[6]:
 
 
 def combine_classes(dataset):
-    dataset['label']=[1 if x=="true"or x=="mostly-true" else 0 for x in dataset[1]]
-    
-    #Dealing with empty datapoints for metadata columns - subject, speaker, job, state,affiliation, context
-    meta = []
-    for i in range(len(dataset)):
-        subject = dataset[3][i]
-        if subject == 0:
-            subject = 'None'
-
-        speaker =  dataset[4][i]
-        if speaker == 0:
-            speaker = 'None'
-
-        job =  dataset[5][i]
-        if job == 0:
-            job = 'None'
-
-        state =  dataset[6][i]
-        if state == 0:
-            state = 'None'
-
-        affiliation =  dataset[7][i]
-        if affiliation == 0:
-            affiliation = 'None'
-
-        context =  dataset[13][i]
-        if context == 0 :
-            context = 'None'
-            
-        meta.append(str(subject) + ' ' + str(speaker) + ' ' + str(job)+ ' ' + str(context)) #combining all the meta data columns into a single column
-        
-
-    #Adding cleaned and combined metadata column to the dataset
-    dataset[14] = meta
-    dataset["sentence"] = dataset[14].astype('str')+" "+dataset[2]
-    
-    #Dropping unwanted columns
-    dataset = dataset.drop(labels=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14] ,axis=1)
-    dataset.dropna()
-    return dataset
-
-
-# In[11]:
-
-
-def combine_classes_distribute_half_true(dataset):
-    
-    half_true_instances = dataset[dataset[1] == 'half-true']
-    num_half_true = len(half_true_instances)
-    split_index = num_half_true // 2
-
-    # Mark the first half as 'fake' and the second half as 'true'
-    half_true_instances.loc[:split_index-1, 1] = 'false'
-    half_true_instances.loc[split_index:, 1] = 'true'
-    dataset.update(half_true_instances)
-
-    dataset['label']=[1 if x=="true"or x=="mostly-true" else 0 for x in dataset[1]]
-    dataset['weight']=[2 if x==1 else 1 for x in dataset['label']]
-    
-    #Dealing with empty datapoints for metadata columns - subject, speaker, job, state,affiliation, context
-    meta = []
-    for i in range(len(dataset)):
-        subject = dataset[3][i]
-        if subject == 0:
-            subject = 'None'
-
-        speaker =  dataset[4][i]
-        if speaker == 0:
-            speaker = 'None'
-
-        job =  dataset[5][i]
-        if job == 0:
-            job = 'None'
-
-        state =  dataset[6][i]
-        if state == 0:
-            state = 'None'
-
-        affiliation =  dataset[7][i]
-        if affiliation == 0:
-            affiliation = 'None'
-
-        context =  dataset[13][i]
-        if context == 0 :
-            context = 'None'
-            
-        meta.append(str(subject) + ' ' + str(speaker) + ' ' + str(job) + ' ' + str(state) + ' ' + str(affiliation) + ' ' + str(context)) #combining all the meta data columns into a single column
-        
-
-    #Adding cleaned and combined metadata column to the dataset
-    dataset[14] = meta
-    dataset["sentence"] = dataset[14].astype('str')+" "+dataset[2]
-    
-    #Dropping unwanted columns
-    dataset = dataset.drop(labels=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14] ,axis=1)
-    dataset.dropna()
-    return dataset
-
-
-# In[ ]:
-
-
-def combine_classes_drop_half_true(dataset):
     dataset = dataset[dataset[1] != 'half-true'].reset_index(drop=True)
     dataset['label']=[1 if x=="true"or x=="mostly-true" else 0 for x in dataset[1]]
+#     dataset['weight']=[1 if x==1 else 2 for x in dataset['label']]
     
     #Dealing with empty datapoints for metadata columns - subject, speaker, job, state,affiliation, context
     meta = []
@@ -273,7 +173,7 @@ def data_tokenizer(X_train, X_test, data_set_all):
 # In[108]:
 
 
-def tfidf_vectorizer(X_train, X_test, MAX_SEQUENCE_LENGTH=300,EMBEDDING_DIM=150):
+def tfidf_vectorizer(X_train, X_test):
 #     vectorizer = TfidfVectorizer()
     X_train_vectorized = vectorizer.fit_transform(X_train)
     X_test_vectorized = vectorizer.transform(X_test)
@@ -292,7 +192,7 @@ def tfidf_vectorizer(X_train, X_test, MAX_SEQUENCE_LENGTH=300,EMBEDDING_DIM=150)
 # In[118]:
 
 
-def word2vec_vectorizer(X_train, X_test, data_set_all, MAX_SEQUENCE_LENGTH=300,EMBEDDING_DIM=150):
+def word2vec_vectorizer(X_train, X_test, data_set_all):
     
     word2vec_model = Word2Vec(sentences=[text.split() for text in data_set_all['sentence']],
                               vector_size=EMBEDDING_DIM, window=5, min_count=1, workers=4)
@@ -329,7 +229,7 @@ def word2vec_vectorizer(X_train, X_test, data_set_all, MAX_SEQUENCE_LENGTH=300,E
 # In[120]:
 
 
-def tokenize_vectorize(data_set, data_train, data_test, MAX_SEQUENCE_LENGTH=300,EMBEDDING_DIM=150):
+def tokenize_vectorize(data_set, data_train, data_test):
     tokenizer = Tokenizer()
     tokenizer.fit_on_texts(data_set['sentence'])
     
@@ -400,13 +300,13 @@ def oversampling_data(X,y):
 # In[112]:
 
 
-# def tokenize_vectorize_data(data_set,EMBEDDING_DIM=150):
-#     # Tokenization
-#     tokenizer.fit_on_texts(your_text_data)
-#     sequences = tokenizer.texts_to_sequences(your_text_data)
+def tokenize_vectorize_data(data_set):
+    # Tokenization
+    tokenizer.fit_on_texts(your_text_data)
+    sequences = tokenizer.texts_to_sequences(your_text_data)
 
-#     # Word2Vec
-#     word2vec = Word2Vec(sentences=sequences, vector_size=EMBEDDING_DIM, window=5, min_count=1, workers=4)
+    # Word2Vec
+    word2vec = Word2Vec(sentences=sequences, vector_size=EMBEDDING_DIM, window=5, min_count=1, workers=4)
 
 
 # In[113]:

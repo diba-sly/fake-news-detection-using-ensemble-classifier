@@ -19,18 +19,10 @@ import time
 import seaborn as sns
 
 
-# In[20]:
-
-
-# Constants
-MAX_SEQUENCE_LENGTH = 300
-EMBEDDING_DIM = 150
-
-
 # In[27]:
 
 
-def train_bilstm(vocab_size,X_train,y_train,epochs=10,batch_size=128):
+def train_bilstm(vocab_size,X_train,y_train,epochs=10,batch_size=128,MAX_SEQUENCE_LENGTH = 300,EMBEDDING_DIM = 150):
 
     start_time = time.time()
     loss_values = []
@@ -56,10 +48,14 @@ def train_bilstm(vocab_size,X_train,y_train,epochs=10,batch_size=128):
 # In[22]:
 
 
-def predict_bilstm(bilstm_model, X_train, X_test):
-    bilstm_train_predictions = (bilstm_model.predict(X_train) > 0.3).astype(int).flatten()
-    bilstm_predictions = (bilstm_model.predict(X_test) > 0.3).astype(int).flatten()
-    return bilstm_train_predictions, bilstm_predictions
+def predict_bilstm(bilstm_model, X_train, X_test, threshold=0.3):
+    bilstm_scores=bilstm_model.predict(X_test)
+    bilstm_train_scores=bilstm_model.predict(X_train)
+    
+    bilstm_train_predictions = (bilstm_train_scores > threshold).astype(int).flatten()
+    bilstm_predictions = ( bilstm_scores> threshold).astype(int).flatten()
+    
+    return bilstm_train_predictions, bilstm_predictions,bilstm_train_scores,bilstm_scores
 
 
 # In[29]:

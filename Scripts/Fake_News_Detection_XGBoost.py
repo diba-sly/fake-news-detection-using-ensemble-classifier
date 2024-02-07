@@ -3,7 +3,7 @@
 
 # XGBoost classifier
 
-# In[5]:
+# In[14]:
 
 
 import xgboost as xgb
@@ -14,14 +14,17 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import precision_recall_fscore_support
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import KFold
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import learning_curve
 
 
-# In[6]:
+# In[12]:
 
 
-def train_xgboost_search():
-    dtrain = xgb.DMatrix(X_train_valid_resampled, label=y_train_valid_resampled)
-    dtest = xgb.DMatrix(X_test_vectorized, label=y_test)
+def train_xgboost_search(X_train, y_train, X_test, y_test):
+    dtrain = xgb.DMatrix(X_train, label=y_train)
+    dtest = xgb.DMatrix(X_test, label=y_test)
                         
     # Define the parameter grid to search over
     param_grid={
@@ -38,50 +41,80 @@ def train_xgboost_search():
     xgb_model = xgb.XGBClassifier()
 
     grid_search = GridSearchCV(estimator=xgb_model, param_grid=param_grid, scoring='f1', cv=10)
-    grid_search.fit(X_train_valid_resampled, y_train_valid_resampled)
+    grid_search.fit(X_train, y_train)
 
     best_params = grid_search.best_params_
     print("Best Parameters found by Grid Search:", best_params)
 
     model = xgb.train(best_params, dtrain, num_rounds)
     y_pred = model.predict(dtest)
-    y_pred_binary = [1 if p >= 0.4 else 0 for p in y_pred]
+    y_pred_binary = [1 if p >= 0.5 else 0 for p in y_pred]
 
     return y_pred_binary
 
 
-# In[7]:
+# In[19]:
 
 
-def train_xgboost(X_train, y_train, X_test, y_test):
+def train_xgboost(X_train, y_train, X_test, y_test, params, rounds=300, threshold=0.4):
     start_time = time.time()
     
     dtrain = xgb.DMatrix(X_train, label=y_train)
     dtest = xgb.DMatrix(X_test, label=y_test)
     
-    params = {
-    'objective': 'binary:logistic',  # or 'multi:softmax' for multi-class classification
-    'eval_metric': 'logloss',  # or other appropriate evaluation metric
-    'eta': 0.01,  # learning rate
-    'max_depth': 20,  # maximum depth of a tree
-    'subsample': 0.2,  # subsample ratio of the training instances
-    'colsample_bytree': 0.8  # subsample ratio of columns when constructing each tree
-    }
+#     params = {
+#     'objective': 'binary:logistic',  # or 'multi:softmax' for multi-class classification
+#     'eval_metric': 'logloss',  # or other appropriate evaluation metric
+#     'eta': 0.01,  # learning rate
+#     'max_depth': 20,  # maximum depth of a tree
+#     'subsample': 0.2,  # subsample ratio of the training instances
+#     'colsample_bytree': 0.8  # subsample ratio of columns when constructing each tree
+#     }
     
-    num_rounds = 300  # number of boosting rounds (iterations)     
+    num_rounds = rounds  # number of boosting rounds (iterations)     
     model = xgb.train(params, dtrain, num_rounds)
-    y_pred = model.predict(dtest)
-
-    y_train_valid_predictions = model.predict(dtrain)
     
-    y_pred_binary = [1 if p >= 0.4 else 0 for p in y_pred]
-    xgb_train_valid_predictions = [1 if p >= 0.4 else 0 for p in y_train_valid_predictions]
+    
+    y_pred = model.predict(dtest)
+    y_train_valid_pred = model.predict(dtrain)
+    
+    xgb_pred_binary = [1 if p >= threshold else 0 for p in y_pred]
+    xgb_train_valid_pred_binary = [1 if p >= threshold else 0 for p in y_train_valid_pred]
     
     end_time = time.time()
     execution_time = end_time - start_time
-    print("Execution time of PA: {:.2f} seconds".format(execution_time))
+    print("Execution time of XGBoost: {:.2f} seconds".format(execution_time))
     
-    return y_pred_binary, xgb_train_valid_predictions, y_pred
+    return xgb_pred_binary, xgb_train_valid_pred_binary, y_pred, y_train_valid_pred
+
+
+# In[1]:
+
+
+def xgboost_cross_validation(X_train, y_train, params, rounds=300, fold=5):
+    dtrain = xgb.DMatrix(X_train, label=y_train)
+   
+#     params = {
+#     'objective': 'binary:logistic',  # or 'multi:softmax' for multi-class classification
+#     'eval_metric': 'logloss',  # or other appropriate evaluation metric
+#     'eta': 0.01,  # learning rate
+#     'max_depth': 20,  # maximum depth of a tree
+#     'subsample': 0.2,  # subsample ratio of the training instances
+#     'colsample_bytree': 0.8  # subsample ratio of columns when constructing each tree
+#     }
+    
+    num_rounds = rounds  # number of boosting rounds (iterations)     
+    model = xgb.train(params, dtrain, num_rounds)
+    
+    kfold = KFold(n_splits=fold, shuffle=True, random_state=42)
+    
+    def f1_scoring(estimator, X, y):
+        y_pred = estimator.predict(xgb.DMatrix(X))
+        return f1_score(y, y_pred)
+    
+    results = cross_val_score(model, X_train, y_train, cv=kfold, scoring=f1_scoring)
+    
+    print(f'F1 Score: {results.mean():.4f} (+/- {results.std():.4f})')
 
 
 # In[8]:
@@ -132,14 +165,34 @@ def xgb_roc_plot(xgb_predictions, y_test):
     plt.show()
 
 
+# In[18]:
+
+
+def xgb_f1_threshold_plot(y_test, y_pred):
+    thresholds = np.linspace(0, 1, 100)
+    f1_scores = [f1_score(y_test, y_pred > threshold) for threshold in thresholds]
+    # Plot F1 score vs. threshold
+    plt.figure()
+    plt.plot(thresholds, f1_scores)
+    plt.xlabel('Threshold')
+    plt.ylabel('F1 Score')
+    plt.title('F1 Score vs. Threshold - XGBoost')
+    plt.show()
+
+
 # In[ ]:
 
 
+def xgb_learning_plot():
+    # Plot learning curve
+    train_sizes, train_scores, test_scores = learning_curve(model, X_train, y_train, scoring='f1', cv=5)
 
-
-
-# In[ ]:
-
-
-
+    plt.figure()
+    plt.plot(train_sizes, np.mean(train_scores, axis=1), label='Training score')
+    plt.plot(train_sizes, np.mean(test_scores, axis=1), label='Cross-validation score')
+    plt.xlabel('Number of training examples')
+    plt.ylabel('F1 Score')
+    plt.title('Learning Curve - XGBoost')
+    plt.legend()
+    plt.show()
 

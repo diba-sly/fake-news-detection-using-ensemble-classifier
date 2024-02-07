@@ -3,7 +3,7 @@
 
 # PA Classifier
 
-# In[15]:
+# In[23]:
 
 
 from sklearn.linear_model import PassiveAggressiveClassifier
@@ -14,50 +14,72 @@ from sklearn.metrics import precision_recall_fscore_support
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import cross_val_score, KFold
+import numpy as np
 
 
-# In[9]:
+# In[7]:
 
 
-def train_pa_gridshearch():
+def train_pa_gridshearch(X_train,y_train,param_grid,k_folds=5):
     start_time = time.time()
-    param_grid = {
-    'C': [0.1,0.5,],              # Regularization parameter
-    'fit_intercept': [True, False],
-    'max_iter': [500,1000],          # Maximum number of iterations
-    'tol': [1e-6, 1e-7]              # Tolerance for stopping criterion
-    }
+#     param_grid = {
+#     'C': [0.01,0.1,],              # Regularization parameter
+#     'fit_intercept': [True, False],
+#     'max_iter': [500,1000],          # Maximum number of iterations
+#     'tol': [1e-7, 1e-9]              # Tolerance for stopping criterion
+#     }
    # Create a PassiveAggressiveClassifier
     pa = PassiveAggressiveClassifier()
 
-    grid_search = GridSearchCV(pa, param_grid, cv=5, scoring='accuracy')
-    grid_search.fit(X_train_valid_resampled, y_train_valid_resampled)
+    grid_search = GridSearchCV(pa, param_grid, cv=k_folds, scoring='f1')
+    grid_search.fit(X_train, y_train)
 
     best_params = grid_search.best_params_
     best_score = grid_search.best_score_
 
     print("Best Parameters:", best_params)
     print("Best Score:", best_score)
-    
+    return best_params, best_score
 
 
-# In[10]:
+# In[5]:
 
 
-def train_pa(X_train,y_train,X_test):
+def train_pa(X_train,y_train,X_test,c = 0.01,iteration=500, tol=1e-7):
     start_time = time.time()
     
-    pa_model = PassiveAggressiveClassifier(C = 0.01, random_state = 42, max_iter=1000, early_stopping=True, tol=1e-9)
+    pa_model = PassiveAggressiveClassifier(C = c, random_state = 42, max_iter=iteration, early_stopping=True, tol=tol)
     pa_model.fit(X_train, y_train)
     
     pa_train_valid_predictions = pa_model.predict(X_train)
     pa_predictions = pa_model.predict(X_test)
+    
     y_scores = pa_model.decision_function(X_test)
+    y_train_scores = pa_model.decision_function(X_train)
     
     end_time = time.time()
     execution_time = end_time - start_time
     print("Execution time of PA: {:.2f} seconds".format(execution_time))
-    return pa_predictions,pa_train_valid_predictions,y_scores
+    return pa_predictions,pa_train_valid_predictions,y_scores,y_train_scores
+
+
+# In[6]:
+
+
+def pa_cross_validation(X_train, y_train,k_folds=5,c = 0.01,iteration=500, tol=1e-7):
+    # Define the number of folds
+    
+    kf = KFold(n_splits=k_folds, shuffle=True, random_state=42)
+    
+    # Define your model
+    pa_model = PassiveAggressiveClassifier(C=c, random_state=42, max_iter=iteration, early_stopping=True, tol=tol)
+
+    # Perform cross-validation
+    cross_val_scores = cross_val_score(pa_model, X_train, y_train, cv=kf, scoring='f1')
+    print("Cross-Validationf1 scores:", cross_val_scores)
+    print("Mean f1 score:", np.mean(cross_val_scores))
+    
 
 
 # In[11]:
