@@ -15,27 +15,45 @@ This repo is related to a my researches "Improving F-Score for Fake News Detecti
 - Dataset: LIAR
 
 # Models:
-
-## Model 4:
-This model contains ensemble of SVM, LSTM and PA as first classifier and then using stacking ensemble for inputs of MLP classifier.
-
-
-## Model 5:
-This model contains ensemble of SVM, LSTM, PA and XGBoost as first classifier and then using stacking ensemble for inputs of MLP classifier.
-
-The main diffrence of Model4 with Model 5 is in preproccesing. In Model 5 I used SMOTE for oversampling 'Real' news in datasets for equl distribution between classes.
-
-Also I added more plots for classifiers in this one.
-
-## Model 6:
-
-This model contains ensemble of SVM, PA, XGBoost, LSTM and BiLSTM as first classifier and then using stacking ensemble for inputs of MLP classifier.
-the main diffrence of this Model6 is that the machine learnings models (SVM, PA and XGBoost) are vectorized just by TFIDF and then oversampling with SMOTE. but the deep learnings model (LSTM and BiLSTM) are tokenized and vectorized by Word2Vec. This is beacuse of the effects of preprocesses on result of each model.
+This model contains ensemble of SVM, PA, XGBoost, LSTM and BiLSTM as first classifier and then using stacking ensemble for inputs of final classifier
 
 The functionality of each model are seprated in diffrente '.ipnyb' files. and then the scripts of them are in Scripts folder, so in Model6 I imported the Scripts models to use the functionality of them.
 
-**Experiment History:** 
+## Model 6:
+- We drop 'half-true' datas and combine classes to 2 classes.
+- Then we have full preproccesing on data.
+- Then we tokenized and used Word2Vec on data.
+- Stacking is by binary prediction of models.
+- Embedding dim is 1500
+The functionality of each model are seprated in diffrente '.ipnyb' files. and then the scripts of them are in Scripts folder, so in Model6 I imported the Scripts models to use the functionality of them.
 
+
+## Model 7:
+- We combine classes to 2 classes. then we merge 50% of 'half-true' data in class 1 and rest of it in class 2.
+- We used full preproccess.
+- We tokenized and used Word2Vec.
+- We use y_scores for stacking but it wasn't helpfull so we used binary predictions.
+
+## Model 8:
+- We combined classes to 2 classes. The 2 of them as True and rest of them as False.
+- We used full preproccess.
+- We tokenized and used Word2Vec.
+- We used binary prediction for stacking.
+
+## Model 9:
+- We drop 'half-true' datas and combine classes to 2 classes.
+- Then we have full preproccesing on data.
+- Then we tokenized and used Word2Vec on data.
+- Stacking is by binary prediction of models.
+- Embedding dim is 150
+  
+## Model 10:
+- We drop 'half-true' datas and combine classes to 2 classes.
+- We did TFIDF on data for machine learning models.
+- We did Word2Vec on data for deep learning models.
+- Then we have full preproccesing on data.
+- Stacking is by binary prediction of models.
+- Embedding dim is 150
 
 
 
