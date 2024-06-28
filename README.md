@@ -19,7 +19,7 @@ This model contains ensemble of SVM, PA, XGBoost, LSTM and BiLSTM as first class
 
 The functionality of each model are seprated in diffrente '.ipnyb' files. and then the scripts of them are in Scripts folder. 
 
-**To access other implemention of models you can checkout on their branches. **
+**To access other implemention of models you can checkout on their branches.**
 
 ## Model 9:
 - We drop 'half-true' datas and combine classes to 2 classes.
