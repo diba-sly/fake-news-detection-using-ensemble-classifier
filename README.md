@@ -4,6 +4,8 @@ This repo is related to a my researches "Improving F-Score for Fake News Detecti
 
 # Structure
 
+**My Thesis**: [Diba-Salehieh-final.pdf](https://github.com/user-attachments/files/16027880/Diba-Salehieh-final.pdf)
+
 **UsedPaper:** Based of "Deep Ensemble Fake News Detection Model Using Sequential Deep Learning Technique".
 
 **liar_dataset:** The LIAR dataset is exist in "sample_data" folder. It downloades from public available link.
