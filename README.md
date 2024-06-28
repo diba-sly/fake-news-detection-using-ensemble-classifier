@@ -17,7 +17,9 @@ This repo is related to a my researches "Improving F-Score for Fake News Detecti
 # Models:
 This model contains ensemble of SVM, PA, XGBoost, LSTM and BiLSTM as first classifier and then using stacking ensemble for inputs of final classifier
 
-The functionality of each model are seprated in diffrente '.ipnyb' files. and then the scripts of them are in Scripts folder.
+The functionality of each model are seprated in diffrente '.ipnyb' files. and then the scripts of them are in Scripts folder. 
+
+**To access other implemention of models you can checkout on their branches. **
 
 ## Model 9:
 - We drop 'half-true' datas and combine classes to 2 classes.
